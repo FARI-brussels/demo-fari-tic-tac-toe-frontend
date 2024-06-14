@@ -1,22 +1,64 @@
 <template>
   <div class="layout bg-color-blue">
-  <div class="gameboard">
-    <TicTacToeCanvas :disabled="drawingDisabled" ref="gameBoard"/>
-    <div class="button-container">
-        <FButtonIcon @click="undo" name="cross" color="red"></FButtonIcon>
-        <FButtonIcon @click="endTurn" name="check" color="green"></FButtonIcon>
+    <div class="gameboard">
+      <TicTacToeCanvas :disabled="drawingDisabled" ref="gameBoard" />
+      <div class="button-container">
+        <FButtonIcon @click="undo" name="undo" color="red" :disabled="drawingDisabled" />
+        <FButtonIcon @click="endTurn" name="check" color="green" :disabled="drawingDisabled" />
+      </div>
     </div>
-  </div>
-    <GameStats v-bind="game" />
+    <GameStats
+      v-bind="game"
+      @start-game="startGame"
+      @restart-game="startGame"
+      @exit-game="resetState"
+      :loading="true"
+    />
 
     <FSlideTransition :show="showError">
       <FContainer v-if="showError" class="dialog">
-        <h1 class="title"> Unrecognized move </h1>
-        <p> It seems like your move was not recognized by the robot, can you try again?  </p>
-        <FButton @click=" () => showError = false" label="OK" color="green"/>
-      </FContainer> 
-      </FSlideTransition>
+        <h1 class="title">Uh-ooh 🫢</h1>
+        <p>Something went wrong, try again?</p>
+        <!-- <h1 class="title"> Unrecognized move </h1>
+        <p> It seems like your move was not recognized by the robot, can you try again?  </p> -->
+        <FButton @click="() => (showError = false)" label="OK" color="green" />
+      </FContainer>
+    </FSlideTransition>
 
+    <FSlideTransition :show="showWinner">
+      <FContainer v-if="showWinner" class="dialog">
+        <h1 class="title">Winner: {{ winner }}</h1>
+        <div class="trophy-container">
+          <img
+            v-if="winner === 'robot'"
+            src="./assets/trophy-robot-transparent.png"
+            class="trophy"
+          />
+          <img
+            v-else-if="winner === 'human'"
+            src="./assets/trophy-human-transparent.png"
+            class="trophy"
+          />
+        </div>
+
+        <p v-if="winner === 'robot'" class="text-winner">Better luck next time!</p>
+        <p v-else-if="winner === 'human'" class="text-winner">You win! Congratulations!</p>
+
+        <div class="action-button-container">
+          <FButton @click="() => (showWinner = false)" label="Close" color="green" />
+          <FButton
+            @click="
+              () => {
+                showWinner = false
+                startGame()
+              }
+            "
+            label="Restart"
+            color="blue"
+          />
+        </div>
+      </FContainer>
+    </FSlideTransition>
   </div>
 </template>
 
@@ -24,33 +66,47 @@
 import TicTacToeCanvas from './components/TicTacToeCanvas.vue'
 import GameStats from './components/GameStats.vue'
 import { storeToRefs } from 'pinia'
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useGameStore } from './stores/game'
 import { FContainer, FButton, FButtonIcon, FSlideTransition } from 'fari-component-library'
+import confetti from 'canvas-confetti'
 
 const showError = ref(false)
+const showWinner = ref(false)
 
-const { game, loading, error, locale } = storeToRefs(useGameStore())
-const { getData, setLocale } = useGameStore()
-
-onMounted(getData)
+const { game, error, locale, winner } = storeToRefs(useGameStore())
+const { drawGrid, setLocale, resetState, playMove } = useGameStore()
 
 const gameBoard = ref()
-const drawingDisabled = ref(false)
+const drawingDisabled = ref(true)
 
-function endTurn() {
+async function endTurn() {
   const image = gameBoard.value.canvas.toDataURL('image/png')
-  showError.value = true
-  game.value.robot.points++
+  await playMove(image)
   drawingDisabled.value = false
 }
 
 function undo() {
   gameBoard.value?.undo()
-  // showError.value = false
-  drawingDisabled.value = false;
+  showError.value = false
+  drawingDisabled.value = false
 }
 
+async function startGame() {
+  await drawGrid()
+  drawingDisabled.value = false
+}
+
+watch(winner, (val) => {
+  if (!val) return
+  showWinner.value = true
+  confetti({ particleCount: 1000, spread: 800 })
+})
+
+watch(error, (val) => {
+  if (!val) return
+  showError.value = true
+})
 </script>
 
 <style scoped lang="scss">
@@ -70,7 +126,6 @@ function undo() {
   top: 35%;
   left: 30%;
 
-
   border-radius: 36px;
   box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);
   .title {
@@ -83,8 +138,6 @@ function undo() {
     letter-spacing: -0.96px;
     margin-bottom: 1.5rem;
   }
-
-
 }
 p {
   color: black;
@@ -98,8 +151,29 @@ p {
   position: absolute;
   bottom: 2rem;
   right: 2rem;
-    display: flex;
-    justify-content: end;
-    gap: 1.5rem;
+  display: flex;
+  justify-content: end;
+  gap: 1.5rem;
+}
+
+.trophy-container {
+  margin: 3rem;
+  .trophy {
+    width: 200px;
+    height: 200px;
   }
+}
+
+.action-button-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.text-winner {
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: 1rem;
+}
 </style>

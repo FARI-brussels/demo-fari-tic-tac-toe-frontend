@@ -26,7 +26,7 @@ const context = ref<CanvasRenderingContext2D | null>(null)
 
 const emit = defineEmits(['updateGame'])
 
-const props = defineProps<{disabled?: boolean}>()
+const props = defineProps<{ disabled?: boolean }>()
 
 let isDrawing = false
 
@@ -65,7 +65,7 @@ onMounted(() => {
 })
 
 function startDrawing(event: MouseEvent | TouchEvent) {
-  if(props.disabled) return
+  if (props.disabled) return
   saveCanvasState()
   isDrawing = true
   const { x, y } = getCoordinates(event)
@@ -108,7 +108,7 @@ function getCoordinates(event: MouseEvent | TouchEvent) {
 }
 
 function finishDrawing() {
-  if(props.disabled) return
+  if (props.disabled) return
   isDrawing = false
   emit('updateGame', { x: lastX, y: lastY, symbol: 'X' })
   lastX = null

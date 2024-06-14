@@ -1,6 +1,6 @@
 <template>
   <div class="game-stats-container rounded container border-color-blue-light">
-    <h1 class="title">Robot vs Human</h1>
+    <h1 class="title">Human vs Robot</h1>
     <div class="players">
       <PlayerCard v-bind="$props.human" />
       <PlayerCard v-bind="$props.robot" />
@@ -8,8 +8,20 @@
 
     <div class="robot-vision-container bg-color-blue-light"></div>
     <div class="button-container">
-      <FButton type="secondary" on-dark label="exit" />
-      <FButton type="primary" on-dark label="restart" />
+      <FButton
+        type="secondary"
+        on-dark
+        label="exit"
+        :disabled="!$props.started || $props.finished"
+        @click="$emit('exitGame')"
+      />
+
+      <FButton
+        type="primary"
+        on-dark
+        :label="$props.started ? 'restart' : 'start game'"
+        @click="() => ($props.started ? $emit('restartGame') : $emit('startGame'))"
+      />
     </div>
   </div>
 </template>
@@ -18,7 +30,7 @@
 import PlayerCard from './PlayerCard.vue'
 import { FButton } from 'fari-component-library'
 import type { GameStats } from '../types/Game'
-
+defineEmits(['startGame', 'restartGame', 'exitGame'])
 defineProps<GameStats>()
 </script>
 
