@@ -1,3 +1,4 @@
+import type { Locale } from './Locale'
 export interface Player {
   symbol: 'X' | 'O' | undefined
   points: number
@@ -16,44 +17,49 @@ export interface RobotPlayer extends Player {
 export interface GameStats {
   human: HumanPlayer
   robot: RobotPlayer
+  started: boolean
+  finished: boolean
+  loading: boolean
 }
 
+export const CANVAS_CENTER = [0.2, 0.1] as const
+export const CANVAS_SIZE = [0.1, 0.1] as const
+// export const CANVAS_CENTER = [ 540, 414 ] as const;
+// export const CANVAS_SIZE = [0.1] as const
 
-export const CANVAS_CENTER = { x: 540, y: 414 } as const;
+type GridItem = 'X' | 'O' | ' '
 
+type GridRow = [GridItem, GridItem, GridItem]
 
+export type Grid = [GridRow, GridRow, GridRow]
 
-const API = {
-  "grid_state": [["l_00", "l_01", "l_02"], ["l_10", "l_11", "l_12"], ["l_20", "l_21", "l_22"]],
-  "move": "letter : l in (i, j)",
-  "game_is_finished": Bool,
-  "winner": "None if not game_is_finished else l"
+export interface DrawGridRequest {
+  center: readonly [number, number]
+  size: readonly [number, number]
 }
 
-
-const responseBody = {
-  grid_state: [
-    ["l_00", "l_01", "l_02"], 
-    ["l_10", "l_11", "l_12"], 
-    ["l_20", "l_21", "l_22"]],
-  
+export interface DrawGridResponse {
+  message: string
 }
 
-type GridItem = 'X' | 'O' | " "
-
-type GridRow = [GridItem, GridItem, GridItem];
-
-type Grid = [GridRow, GridRow, GridRow];
-
-const lol = {
-  "grid_state": [["0", "", " "], ["O", "X", " "], ["X", " ", " "]],
-  "move": "letter : X in (2,0)",
-  "game_is_finished": false,
-  "winner": null
+export interface PlayMoveRequest {
+  image: string
 }
 
+export interface PlayMoveResponse {
+  grid_state: string[][]
+  move: string
+  game_is_finished: boolean
+  winner: 'human' | 'robot' | null
+}
 
-type ResponseBody = {
-  grid_state: Grid,
-  
+export interface GameState {
+  loading: boolean
+  game: GameStats
+  locale: Locale
+  error: any
+  gridMessage: string | null
+  winner: 'human' | 'robot' | null
+  gridState: string[][] | null
+  move: string | null
 }
