@@ -26,7 +26,7 @@
     </FSlideTransition>
 
     <FSlideTransition :show="showWinner">
-      <FContainer v-if="showWinner" class="dialog">
+      <FContainer v-if="showWinner" class="dialog-winner">
         <h1 class="title">Winner: {{ winner }}</h1>
         <div class="trophy-container">
           <img
@@ -45,7 +45,7 @@
         <p v-else-if="winner === 'human'" class="text-winner">You win! Congratulations!</p>
 
         <div class="action-button-container">
-          <FButton @click="() => (showWinner = false)" label="Close" color="green" />
+          <FButton @click="() => (showWinner = false)" label="Close" outline type="secondary" />
           <FButton
             @click="
               () => {
@@ -54,7 +54,7 @@
               }
             "
             label="Restart"
-            color="blue"
+            type="primary"
           />
         </div>
       </FContainer>
@@ -138,7 +138,13 @@ watch(error, (val) => {
     letter-spacing: -0.96px;
     margin-bottom: 1.5rem;
   }
+  &-.winner {
+    top: 25%;
+  }
 }
+
+
+
 p {
   color: black;
 }
