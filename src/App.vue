@@ -2,10 +2,24 @@
   <div class="layout bg-color-blue">
     <div class="gameboard">
       <TicTacToeCanvas :disabled="drawingDisabled" ref="gameBoard" />
-      <div class="button-container">
+
+      <div class="game-buttons">
         <FButtonIcon @click="undo" name="undo" color="red" :disabled="drawingDisabled" />
         <FButtonIcon @click="endTurn" name="check" color="green" :disabled="drawingDisabled" />
       </div>
+
+        <FDropdown 
+          @select="handleSelect" 
+          name="menu" 
+          color="blue"  
+          location="top-left"
+          :items="[
+            { label: 'Start Game', value: 'start' },
+            { label: 'Exit Game', value: 'exit' }
+          ]"
+          class="dropdown-button"
+        />
+
     </div>
     <GameStats
       v-bind="game"
@@ -18,31 +32,18 @@
     <FSlideTransition :show="showError">
       <FContainer v-if="showError" class="dialog">
         <h1 class="title">Uh-ooh 🫢</h1>
-        <p>Something went wrong, try again?</p>
-        <!-- <h1 class="title"> Unrecognized move </h1>
-        <p> It seems like your move was not recognized by the robot, can you try again?  </p> -->
+        <p> Something went wrong, try again? </p>
         <FButton @click="() => (showError = false)" label="OK" color="green" />
       </FContainer>
     </FSlideTransition>
 
     <FSlideTransition :show="showWinner">
       <FContainer v-if="showWinner" class="dialog-winner">
-        <h1 class="title">Winner: {{ winner }}</h1>
+        <h1 class="title color-primary"> The winner is: the {{ winner }} </h1>
+        <p v-if="winner === 'robot'" class="text-winner"> Unfortunately, the robot won. You can always try again </p>
         <div class="trophy-container">
-          <img
-            v-if="winner === 'robot'"
-            src="./assets/trophy-robot-transparent.png"
-            class="trophy"
-          />
-          <img
-            v-else-if="winner === 'human'"
-            src="./assets/trophy-human-transparent.png"
-            class="trophy"
-          />
+          <AnimationContainer :animation-data="animationData"/>
         </div>
-
-        <p v-if="winner === 'robot'" class="text-winner">Better luck next time!</p>
-        <p v-else-if="winner === 'human'" class="text-winner">You win! Congratulations!</p>
 
         <div class="action-button-container">
           <FButton @click="() => (showWinner = false)" label="Close" outline type="secondary" />
@@ -59,6 +60,9 @@
         </div>
       </FContainer>
     </FSlideTransition>
+
+    <div class="backdrop" :class="{ 'backdrop-active': showError || showWinner }"></div>
+
   </div>
 </template>
 
@@ -68,8 +72,9 @@ import GameStats from './components/GameStats.vue'
 import { storeToRefs } from 'pinia'
 import { ref, watch } from 'vue'
 import { useGameStore } from './stores/game'
-import { FContainer, FButton, FButtonIcon, FSlideTransition } from 'fari-component-library'
-import confetti from 'canvas-confetti'
+import { FContainer, FButton, FButtonIcon, FSlideTransition, FDropdown } from 'fari-component-library'
+import AnimationContainer from './components/AnimationContainer.vue'
+import animationData from './assets/trophy.json'
 
 const showError = ref(false)
 const showWinner = ref(false)
@@ -97,10 +102,15 @@ async function startGame() {
   drawingDisabled.value = false
 }
 
+async function handleSelect(value: string | number) {
+  if(value === 'start') startGame();
+  if(value === 'restart') startGame();
+  if(value === 'exit') resetState();
+}
+
 watch(winner, (val) => {
   if (!val) return
   showWinner.value = true
-  confetti({ particleCount: 1000, spread: 800 })
 })
 
 watch(error, (val) => {
@@ -118,31 +128,51 @@ watch(error, (val) => {
   gap: 2rem;
 }
 
-.dialog {
+.backdrop {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(24, 62, 145, 0.4);
+  backdrop-filter: blur(0);
+  z-index: 1;
+  transition: all 100ms;
+
+  &-active {
+    visibility: visible;
+    opacity: 1;
+    backdrop-filter: blur(2px);
+    transition: all 300ms;
+  }
+}
+
+.dialog, .dialog-winner {
   width: 810px;
   text-align: center;
   position: fixed;
-
   top: 35%;
   left: 30%;
-
   border-radius: 36px;
   box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);
+  z-index: 2;
   .title {
     color: var(--F_Blue, #183e91);
     font-family: Inter;
     font-size: 48px;
     font-style: normal;
     font-weight: 900;
-    line-height: 60px; /* 125% */
+    line-height: 60px;
     letter-spacing: -0.96px;
     margin-bottom: 1.5rem;
   }
-  &-.winner {
-    top: 25%;
-  }
 }
 
+.dialog-winner {
+  top: 25%;
+}
 
 
 p {
@@ -153,21 +183,26 @@ p {
   position: relative;
 }
 
-.button-container {
+
+.game-buttons {
+  display: flex;
+  position: absolute;
+  bottom: 2rem;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.dropdown-button {
   position: absolute;
   bottom: 2rem;
   right: 2rem;
-  display: flex;
-  justify-content: end;
-  gap: 1.5rem;
+
 }
 
 .trophy-container {
-  margin: 3rem;
-  .trophy {
-    width: 200px;
-    height: 200px;
-  }
+  display: flex;
+  justify-content: center;
 }
 
 .action-button-container {
@@ -178,8 +213,9 @@ p {
 }
 
 .text-winner {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 20px;
   margin-top: 1rem;
 }
+
+
 </style>
