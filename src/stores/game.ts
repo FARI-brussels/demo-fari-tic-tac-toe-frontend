@@ -97,7 +97,7 @@ export const useGameStore = defineStore('game', {
       this.error = null
       this.game.human.active = false
       this.game.robot.active = true
-      this.game.human.points++
+  
       try {
         const response = await fetch('http://localhost:3000/play', {
           method: 'POST',
@@ -107,12 +107,11 @@ export const useGameStore = defineStore('game', {
           body: JSON.stringify({ image })
         })
 
-        console.log({ response })
-
-        if (!response.ok) {
+        if (!response.ok) 
           throw new Error(`HTTP error! status: ${response.status}`)
-        }
 
+        this.game.human.points++
+        
         const data: PlayMoveResponse = await response.json()
 
         this.gridState = data.grid_state
@@ -122,7 +121,8 @@ export const useGameStore = defineStore('game', {
         this.game.robot.points++
         this.game.human.active = true
         this.game.robot.active = false
-        
+        this.loading = false
+
       } catch (error: any) {
         console.error('Error:', error)
         this.error = error.message
@@ -160,8 +160,8 @@ export const useGameStore = defineStore('game', {
         }
 
         parsed.forEach((e: { [k: string]: string }) => {
-          console.log(e)
           const { research_head, research_lead, logo, locale, explanation_short } = e
+
           if (logo) this.CMS.data.logo = logo
           if (research_head) this.CMS.data.research_head = research_head
           if (research_lead) this.CMS.data.research_lead = research_lead
