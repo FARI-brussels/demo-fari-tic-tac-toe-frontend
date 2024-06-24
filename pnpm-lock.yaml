@@ -14,12 +14,15 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.5
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
       express:
         specifier: ^4.19.2
         version: 4.19.2
       fari-component-library:
-        specifier: ^0.5.6
-        version: 0.5.6(typescript@5.4.5)
+        specifier: ^0.5.7
+        version: 0.5.7(typescript@5.4.5)
       lottie-web:
         specifier: ^5.12.2
         version: 5.12.2
@@ -1211,6 +1214,10 @@ packages:
   domutils@3.1.0:
     resolution: {integrity: sha512-H78uMmQtI2AhgDJjWeQmHwJJ2bLPD3GMmO7Zja/ZZh84wkm+4ut+IUnUdRa8uCGX88DiVx1j6FRe1XfxEgjEZA==}
 
+  dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+    engines: {node: '>=12'}
+
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
@@ -1335,8 +1342,8 @@ packages:
     resolution: {integrity: sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q==}
     engines: {node: '>= 0.10.0'}
 
-  fari-component-library@0.5.6:
-    resolution: {integrity: sha512-3V3wjInoz6s/uCA/8y50ZPATBLYtR+YT2yWP1i+ZA8toz9O2gDf21g6a1MbBt4I/XP1CgLrGJzO6bo8YvsY3Bg==}
+  fari-component-library@0.5.7:
+    resolution: {integrity: sha512-BWFer4Pxb0jkHjbNOmL4RNtavITPkGFSPgeoAnMXKkdHNCbk6uh7EfaC/Z+EduG9yOwQI7ug+1lnIubu7I4pug==}
 
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
@@ -3357,6 +3364,8 @@ snapshots:
       domelementtype: 2.3.0
       domhandler: 5.0.3
 
+  dotenv@16.4.5: {}
+
   ee-first@1.1.1: {}
 
   electron-to-chromium@1.4.769: {}
@@ -3580,7 +3589,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  fari-component-library@0.5.6(typescript@5.4.5):
+  fari-component-library@0.5.7(typescript@5.4.5):
     dependencies:
       '@vueuse/core': 10.11.0(vue@3.4.27(typescript@5.4.5))
       sass: 1.77.1
