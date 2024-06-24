@@ -43,11 +43,7 @@ app.get('/api/data', async (req: Request, res: Response) => {
     const { localizations, explanation_short, research_head, research_lead } = data.attributes
     const locales = localizations.data.map(({ attributes }: { attributes: Attributes }) => ({ locale: attributes.locale, explanation_short: attributes.explanation_short }))
 
-    const airLogo = await fetch(`${strapiURL}/uploads/air_a5e1c08136.svg`);
-    const logo = await airLogo.text()
-
     const content = [
-      { logo },
       { research_head, research_lead },
       { locale: 'en', explanation_short }, 
       ...locales
@@ -74,7 +70,7 @@ app.post('/draw_grid', async (req: Request, res: Response) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error!? status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     
     const data: DrawGridResponse = await response.json();
