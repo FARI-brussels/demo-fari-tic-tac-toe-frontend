@@ -1,4 +1,4 @@
-import type { Locale } from './Locale'
+import type { Locale, Data } from './Locale'
 export interface Player {
   symbol: 'X' | 'O' | undefined
   points: number
@@ -56,10 +56,13 @@ export interface PlayMoveResponse {
 export interface GameState {
   loading: boolean
   game: GameStats
-  locale: Locale
   error: any
   gridMessage: string | null
   winner: 'human' | 'robot' | null
   gridState: string[][] | null
   move: string | null
+  CMS: {
+    locale: Locale
+    data: Data
+  }
 }

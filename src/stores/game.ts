@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { CANVAS_CENTER, CANVAS_SIZE } from '../types/Game'
-import type { Locale } from '../types/Locale'
+import type { Data, Locale } from '../types/Locale'
 import type {
   DrawGridRequest,
   DrawGridResponse,
@@ -11,6 +11,7 @@ import type {
   HumanPlayer,
   RobotPlayer
 } from '../types/Game'
+
 
 export const useGameStore = defineStore('game', {
   state: () =>
@@ -31,11 +32,23 @@ export const useGameStore = defineStore('game', {
         started: false,
         finished: false
       },
-      locale: 'en',
       loading: false,
       gridMessage: null,
       winner: null,
-      error: null
+      error: null,
+      CMS: {
+        locale: 'en',
+        data: {
+          logo: '',
+          research_head: '',
+          research_lead: '',
+          explanation_short: {
+            en: '',
+            'fr-FR': '',
+            nl: ''
+          }
+        },
+      }
     }) as GameState,
   actions: {
     async drawGrid(
@@ -135,8 +148,33 @@ export const useGameStore = defineStore('game', {
         symbol: undefined
       }
     },
+    async getCMSData() {
+      this.loading = true
+      this.error = null
+      try {
+        const response = await fetch('http://localhost:3000/api/data')
+        const parsed = await response.json()
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+
+        parsed.forEach((e: { [k: string]: string }) => {
+          console.log(e)
+          const { research_head, research_lead, logo, locale, explanation_short } = e
+          if (logo) this.CMS.data.logo = logo
+          if (research_head) this.CMS.data.research_head = research_head
+          if (research_lead) this.CMS.data.research_lead = research_lead
+          if (locale) this.CMS.data.explanation_short[locale as Locale] = explanation_short
+        })
+      } catch (error) {
+        this.error = 'Error fetching data'
+      } finally {
+        this.loading = false
+      }
+    },
     setLocale(locale: Locale): any {
-      this.locale = locale
+      this.CMS.locale = locale
     }
   }
 })
