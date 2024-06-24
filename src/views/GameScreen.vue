@@ -14,7 +14,7 @@
             color="blue"  
             location="top-left"
             :items="[
-              { label: 'Start Game', value: 'start' },
+              { label: game.started ? 'Restart' : 'Start Game', value: 'start' },
               { label: 'Exit Game', value: 'exit' }
             ]"
             class="dropdown-button"
@@ -42,12 +42,7 @@
           <div class="action-button-container">
             <FButton @click="() => (showWinner = false)" label="Close" outline type="secondary" />
             <FButton
-              @click="
-                () => {
-                  showWinner = false
-                  startGame()
-                }
-              "
+              @click="startGame"
               label="Restart"
               type="primary"
             />
@@ -73,8 +68,8 @@
   const showError = ref(false)
   const showWinner = ref(false)
   
-  const { game, error, locale, winner } = storeToRefs(useGameStore())
-  const { drawGrid, setLocale, resetState, playMove } = useGameStore()
+  const { game, error, winner } = storeToRefs(useGameStore())
+  const { drawGrid, resetState, playMove } = useGameStore()
   
   const gameBoard = ref()
   const drawingDisabled = ref(true)

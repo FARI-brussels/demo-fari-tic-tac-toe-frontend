@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { CANVAS_CENTER, CANVAS_SIZE } from '../types/Game'
-import type { Data, Locale } from '../types/Locale'
+import type { Locale } from '../types/Locale'
 import type {
   DrawGridRequest,
   DrawGridResponse,
@@ -115,7 +115,6 @@ export const useGameStore = defineStore('game', {
 
         const data: PlayMoveResponse = await response.json()
 
-        console.log({ data })
         this.gridState = data.grid_state
         this.move = data.move
         this.game.finished = data.game_is_finished
@@ -123,6 +122,7 @@ export const useGameStore = defineStore('game', {
         this.game.robot.points++
         this.game.human.active = true
         this.game.robot.active = false
+        
       } catch (error: any) {
         console.error('Error:', error)
         this.error = error.message
