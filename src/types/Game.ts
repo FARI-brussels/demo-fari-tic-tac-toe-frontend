@@ -22,7 +22,7 @@ export interface GameStats {
   loading: boolean
 }
 
-export const CANVAS_CENTER = [0.2, 0.1] as const
+export const CANVAS_CENTER = [0.1773, 0.1495] as const
 export const CANVAS_SIZE = [0.1, 0.1] as const
 // export const CANVAS_CENTER = [ 540, 414 ] as const;
 // export const CANVAS_SIZE = [0.1] as const

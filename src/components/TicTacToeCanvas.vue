@@ -54,6 +54,14 @@ function undo() {
   restoreCanvasState()
 }
 
+function clearCanvas() {
+  if (context.value && canvas.value) {
+    context.value.fillStyle = '#FFFFFF'
+    context.value.fillRect(0, 0, canvas.value.width, canvas.value.height)
+    canvasStates.length = 0
+  }
+}
+
 onMounted(() => {
   if (canvas.value) {
     context.value = canvas.value.getContext('2d')
@@ -117,7 +125,8 @@ function finishDrawing() {
 
 defineExpose({
   canvas,
-  undo
+  undo,
+  clearCanvas,
 })
 </script>
 

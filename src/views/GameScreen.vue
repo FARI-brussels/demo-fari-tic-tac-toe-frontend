@@ -1,11 +1,11 @@
 <template>
     <div class="layout bg-color-blue">
       <div class="gameboard">
-        <TicTacToeCanvas :disabled="drawingDisabled" ref="gameBoard" />
+        <TicTacToeCanvas :disabled="!game.started" ref="gameBoard" />
   
         <div class="game-buttons">
-          <FButtonIcon @click="undo" name="undo" color="red" :disabled="drawingDisabled" />
-          <FButtonIcon @click="endTurn" name="check" color="green" :disabled="drawingDisabled" />
+          <FButtonIcon @click="undo" name="undo" color="red" :disabled="!game.human.active" />
+          <FButtonIcon @click="endTurn" name="check" color="green" :disabled="!game.human.active" />
         </div>
   
           <FDropdown 
@@ -72,23 +72,21 @@
   const { drawGrid, resetState, playMove } = useGameStore()
   
   const gameBoard = ref()
-  const drawingDisabled = ref(true)
+
   
   async function endTurn() {
     const image = gameBoard.value.canvas.toDataURL('image/png')
     await playMove(image)
-    drawingDisabled.value = false
   }
   
   function undo() {
     gameBoard.value?.undo()
     showError.value = false
-    drawingDisabled.value = false
   }
   
   async function startGame() {
+    gameBoard.value.clearCanvas()
     await drawGrid()
-    drawingDisabled.value = false
   }
   
   async function handleSelect(value: string | number) {
