@@ -1,5 +1,8 @@
 <template>
     <div class="start-screen">
+      <video autoplay muted loop class="background-video">
+        <source src="../assets/OXOplayer.mp4" type="video/mp4" />
+      </video>
       <div class="heading">
         <div class="title">
           <FTitle class="title"> Tic Tac Toe player</FTitle>
@@ -42,6 +45,16 @@ const toggleCard = () => (showCard.value = !showCard.value)
   </script>
   
   <style scoped lang="scss">
+
+.background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
   .start-screen {
     width: 100vw;
     height: 100vh;
@@ -53,6 +66,8 @@ const toggleCard = () => (showCard.value = !showCard.value)
     justify-content: space-around;
     align-items: center;
     flex: 0 0 auto;
+    position: relative;
+    z-index: 0;
   }
 
   .heading {
@@ -72,6 +87,7 @@ const toggleCard = () => (showCard.value = !showCard.value)
 
 .start-button {
   margin-bottom: auto;
+  width: fit-content;
 }
 .card {
   position: absolute;
