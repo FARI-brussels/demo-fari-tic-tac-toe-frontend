@@ -72,7 +72,7 @@
   const showError = ref(false)
   const showWinner = ref(false)
   
-  const { game, error, winner } = storeToRefs(useGameStore())
+  const { game, error, winner, finished } = storeToRefs(useGameStore())
   const { drawGrid, resetState, playMove } = useGameStore()
   
   const gameBoard = ref()
@@ -104,7 +104,7 @@
     }
   }
   
-  watch(winner, (val) => {
+  watch(finished, (val) => {
     if (!val) return
     showWinner.value = true
   })

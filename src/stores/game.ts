@@ -30,11 +30,12 @@ export const useGameStore = defineStore('game', {
           active: false
         } as RobotPlayer,
         started: false,
-        finished: false
+
       },
       loading: false,
       gridMessage: null,
       winner: null,
+      finished: false,
       error: null,
       CMS: {
         locale: 'en',
@@ -60,6 +61,8 @@ export const useGameStore = defineStore('game', {
       try {
         this.resetState()
         this.game.robot.active = true
+        this.game.started = true
+
         const response = await fetch('http://localhost:3000/draw_grid', {
           method: 'POST',
           headers: {
@@ -75,7 +78,7 @@ export const useGameStore = defineStore('game', {
         console.log('Response received:', data)
 
         this.gridMessage = data.message
-        this.game.started = true
+
 
         this.game.human.active = true
         this.game.robot.active = false
@@ -116,7 +119,7 @@ export const useGameStore = defineStore('game', {
 
         this.gridState = data.grid_state
         this.move = data.move
-        this.game.finished = data.game_is_finished
+        this.finished = data.game_is_finished
         this.winner = data.winner
         this.game.robot.points++
         this.game.human.active = true
@@ -133,7 +136,7 @@ export const useGameStore = defineStore('game', {
       this.gridState = null
       this.move = null
       this.game.started = false
-      this.game.finished = false
+      this.finished = false
       this.winner = null
       this.error = null
 

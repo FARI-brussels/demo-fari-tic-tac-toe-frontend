@@ -18,7 +18,6 @@ export interface GameStats {
   human: HumanPlayer
   robot: RobotPlayer
   started: boolean
-  finished: boolean
   loading: boolean
 }
 
@@ -59,6 +58,7 @@ export interface GameState {
   error: any
   gridMessage: string | null
   winner: 'human' | 'robot' | null
+  finished: boolean
   gridState: string[][] | null
   move: string | null
   CMS: {
