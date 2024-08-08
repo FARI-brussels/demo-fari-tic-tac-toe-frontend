@@ -33,9 +33,13 @@
   
       <FSlideTransition :show="showWinner">
         <FContainer v-if="showWinner" class="dialog-winner">
-          <h1 class="title color-primary"> The winner is: the {{ winner }} </h1>
+          <h1 v-if="winner" class="title color-primary"> The winner is: the {{ winner }} </h1>
+          <h1 v-else class="title color-primary"> Draw! </h1>
+
           <p v-if="winner === 'robot'" class="text-winner"> Unfortunately, the robot won. You can always try again </p>
-          <div class="trophy-container">
+          <p v-if="!winner" class="text-winner"> Game is finished. Nobody won. </p>
+
+          <div v-if="winner" class="trophy-container">
             <AnimationContainer :animation-data="animationData"/>
           </div>
   
@@ -85,6 +89,8 @@
   }
   
   async function startGame() {
+    showError.value = false
+    showWinner.value = false
     gameBoard.value.clearCanvas()
     await drawGrid()
   }
