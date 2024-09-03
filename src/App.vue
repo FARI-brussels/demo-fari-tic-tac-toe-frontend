@@ -10,16 +10,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { StartScreen, GameScreen } from './views/index';
+  import { useGameStore } from '@/stores/game'
 
 const startScreenVisible = ref(true)
 const transitionName = ref('slide-left')
-
-const startGame = () => {
+const { start, stop } = useGameStore()
+const startGame = async () => {
+  await start();
   transitionName.value = 'slide-left'
   startScreenVisible.value = false
 }
 
-const exitGame = () => {
+const exitGame = async () => {
+  await stop();
   transitionName.value = 'slide-right'
   startScreenVisible.value = true
 }

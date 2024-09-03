@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-
+import { exec } from 'child_process';
 
 import type { 
   DrawGridRequest, 
@@ -104,6 +104,28 @@ app.post('/play', async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+app.get('/start', (req, res) => {
+  exec('bash /home/fari/Documents/demo-fari-tic-tac-toe-backend/start.sh', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.send(`Error executing script: ${error}`);
+    }
+    res.send(`Script executed successfully: ${stdout}`);
+  });
+});
+
+app.get('/stop', (req, res) => {
+  exec('bash /home/fari/Documents/demo-fari-tic-tac-toe-backend/stop.sh', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.send(`Error executing script: ${error}`);
+    }
+    res.send(`Script executed successfully: ${stdout}`);
+  });
+});
+
 
 app.listen(PORT, () => 
   console.info(`Server is running on http://localhost:${PORT}`)

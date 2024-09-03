@@ -176,6 +176,12 @@ export const useGameStore = defineStore('game', {
         this.loading = false
       }
     },
+    async start(){
+      await fetch('http://localhost:3000/start')
+    },
+    async stop(){
+      await fetch('http://localhost:3000/stop')
+    },
     setLocale(locale: Locale): any {
       this.CMS.locale = locale
     }
