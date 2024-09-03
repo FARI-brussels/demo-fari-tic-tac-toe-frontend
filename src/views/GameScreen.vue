@@ -37,8 +37,9 @@
           <h1 v-else class="title color-primary"> Draw! </h1>
 
           <p v-if="winner === 'robot'" class="text-winner"> Unfortunately, the robot won. You can always try again </p>
-          <p v-if="!winner" class="text-winner"> Game is finished. Nobody won. </p>
-
+          <p v-else-if="winner === 'human'" class="text-winner"> Congratulations! You won! </p>
+          <p v-else-if="!winner" class="text-winner"> Game is finished. Nobody won. </p>
+          
           <div v-if="winner" class="trophy-container">
             <AnimationContainer :animation-data="animationData"/>
           </div>
@@ -104,9 +105,9 @@
     }
   }
   
-  watch(finished, (val) => {
-    if (!val) return
-    showWinner.value = true
+  watch(finished, (isFinished) => {
+    if (!isFinished) showWinner.value = false
+    else showWinner.value = true
   })
   
   watch(error, (val) => {

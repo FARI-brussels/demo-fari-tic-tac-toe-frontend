@@ -26,6 +26,7 @@ defineProps<GameStats>()
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  user-select: none; 
 }
 
 .players {
