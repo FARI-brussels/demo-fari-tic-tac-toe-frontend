@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { StartScreen, GameScreen } from './views/index';
-  import { useGameStore } from '@/stores/game'
+import { useGameStore } from '@/stores/game'
 
 const startScreenVisible = ref(true)
 const transitionName = ref('slide-left')

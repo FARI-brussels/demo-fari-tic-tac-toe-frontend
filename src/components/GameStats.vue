@@ -5,17 +5,95 @@
       <PlayerCard v-bind="$props.human" />
       <PlayerCard v-bind="$props.robot" />
     </div>
-    <!-- <div class="robot-vision-container bg-color-blue-light"></div> -->
+    <div class="robot-vision-container bg-color-blue-light">
+      <canvas id="bboxCanvas"></canvas>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import PlayerCard from './PlayerCard.vue'
-import type { GameStats } from '../types/Game'
 
-defineEmits(['startGame', 'restartGame', 'exitGame'])
-defineProps<GameStats>()
+import PlayerCard from './PlayerCard.vue';
+import type { GameStats } from '../types/Game';
+import { onMounted, onBeforeUnmount } from 'vue';
 
+defineEmits(['startGame', 'restartGame', 'exitGame']);
+defineProps<GameStats>();
+
+
+let socket: WebSocket | null = null;
+let reconnectInterval: number | null = null;
+
+function connectWebSocket() {
+  socket = new WebSocket('ws://0.0.0.0:8080');
+
+  socket.onmessage = (event) => {
+    // Parse the received JSON data
+    console.log(event)
+    const bboxes = JSON.parse(event.data);
+    drawBoundingBoxes(bboxes);
+  };
+
+  socket.onclose = () => {
+    console.log('WebSocket connection closed, attempting to reconnect...');
+    if (!reconnectInterval) {
+      reconnectInterval = window.setInterval(connectWebSocket, 5000); // Retry every 5 seconds
+    }
+  };
+
+  socket.onopen = () => {
+    console.log('WebSocket connection opened');
+    if (reconnectInterval) {
+      window.clearInterval(reconnectInterval);
+      reconnectInterval = null;
+    }
+  };
+
+  socket.onerror = (error) => {
+    console.error('WebSocket error:', error);
+  };
+}
+
+onMounted(() => {
+  connectWebSocket();
+});
+
+onBeforeUnmount(() => {
+  if (socket) {
+    socket.close();
+  }
+  if (reconnectInterval) {
+    clearInterval(reconnectInterval);
+  }
+});
+
+// Function to draw bounding boxes (you need to implement this)
+function drawBoundingBoxes(bboxes: Array<{ x1: number; y1: number; x2: number; y2: number; class: string; confidence: number }>) {
+  const container = document.querySelector('.robot-vision-container');
+  
+  if (container) {
+    container.innerHTML = ''; // Clear previous bounding boxes
+    
+    bboxes.forEach((bbox) => {
+      const { x1, y1, x2, y2, class: cls, confidence } = bbox;
+
+      // Create a div for the bounding box
+      const box = document.createElement('div');
+      box.style.position = 'absolute';
+      box.style.border = '2px solid red';
+      box.style.left = `${x1}px`;
+      box.style.top = `${y1}px`;
+      box.style.width = `${x2 - x1}px`;
+      box.style.height = `${y2 - y1}px`;
+      box.textContent = `${cls} (${confidence}%)`;
+      box.style.color = 'white';
+      box.style.fontSize = '12px';
+      box.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+
+      container.appendChild(box);
+    });
+  }
+}
 </script>
 
 <style scoped lang="scss">
