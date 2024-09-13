@@ -3,7 +3,6 @@
       <FButtonIcon name="chevron-left" color="blue-light" small class="back-button" @click="$emit('exit-game')"/>
       <div class="gameboard">
         <TicTacToeCanvas :disabled="!game.started" ref="gameBoard" />
-  
         <div class="game-buttons">
           <FButtonIcon @click="undo" name="undo" color="red" :disabled="!game.human.active" />
           <FButtonIcon @click="endTurn" name="check" color="green" :disabled="!game.human.active" />
@@ -22,7 +21,7 @@
           />
   
       </div>
-      <GameStats v-bind="game" :loading="true"/>
+      <GameStats v-bind="game" :loading="true" :state="canvasState"/>
   
       <FSlideTransition :show="showError">
         <FContainer v-if="showError" class="dialog">
@@ -64,7 +63,7 @@
   <script setup lang="ts">
   import { TicTacToeCanvas, GameStats, AnimationContainer } from '@/components'
   import { storeToRefs } from 'pinia'
-  import { ref, watch, onMounted, onUnmounted } from 'vue'
+  import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
   import { useGameStore } from '@/stores/game'
   import { FContainer, FButton, FButtonIcon, FSlideTransition, FDropdown } from 'fari-component-library'
   import animationData from '@/assets/trophy'
@@ -78,6 +77,12 @@
   const { drawGrid, resetState, playMove, updateGameBoard } = useGameStore()
   
   const gameBoard = ref()
+
+const canvasState = computed(() => {
+  const state = gameBoard.value?.state
+  console.log(state )
+  return state 
+})
 
   function setUpdateInterval(){
     setInterval(() => gameBoard.value && updateGameBoard(gameBoard.value.canvas), 100)

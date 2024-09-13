@@ -5,8 +5,9 @@
       <PlayerCard v-bind="$props.human" />
       <PlayerCard v-bind="$props.robot" />
     </div>
-    <div class="robot-vision-container bg-color-blue-light">
-      <canvas id="bboxCanvas"></canvas>
+    <div class="robot-vision-container">
+      <!-- <canvas id="bboxCanvas"></canvas> -->
+      <CanvasClone v-bind="$props.state"/>
     </div>
   </div>
 </template>
@@ -15,6 +16,7 @@
 
 import PlayerCard from './PlayerCard.vue';
 import type { GameStats } from '../types/Game';
+import CanvasClone from './CanvasClone.vue'
 
 defineEmits(['startGame', 'restartGame', 'exitGame']);
 defineProps<GameStats>();
@@ -39,7 +41,6 @@ defineProps<GameStats>();
 
 .robot-vision-container {
   height: 20rem;
-  border-radius: 20px;
   position: relative
 }
 

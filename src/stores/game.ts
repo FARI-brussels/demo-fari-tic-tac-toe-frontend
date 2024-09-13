@@ -19,6 +19,7 @@ export const useGameStore = defineStore('game', {
       reconnectInterval: null,
       gameboardImage: null,
       robotVision: null,
+      canvasState: undefined,
       game: {
         human: {
           type: 'human',
@@ -191,7 +192,7 @@ export const useGameStore = defineStore('game', {
     
       this.socket.onclose = () => {
         console.log('WebSocket connection closed, attempting to reconnect...');
-        
+
         if (!this.reconnectInterval) 
           this.reconnectInterval = window.setInterval(this.connectWebSocket, 5000)
       };
