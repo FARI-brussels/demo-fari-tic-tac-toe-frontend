@@ -40,6 +40,7 @@ defineProps<GameStats>();
 .robot-vision-container {
   height: 20rem;
   border-radius: 20px;
+  position: relative
 }
 
 .button-container {

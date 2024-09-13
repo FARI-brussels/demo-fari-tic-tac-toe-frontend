@@ -80,11 +80,11 @@
   const gameBoard = ref()
 
   function setUpdateInterval(){
-    setInterval(() => updateGameBoard(gameBoard.value.canvas), 100)
+    setInterval(() => gameBoard.value && updateGameBoard(gameBoard.value.canvas), 100)
   }
 
   onMounted(setUpdateInterval)
-  onUnmounted(() => clearInterval(setUpdateInterval))
+  //onUnmounted(() => clearInterval(setUpdateInterval))
 
   async function endTurn() {
     updateGameBoard(gameBoard.value.canvas)

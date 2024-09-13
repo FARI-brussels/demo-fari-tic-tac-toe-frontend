@@ -146,6 +146,7 @@ export const useGameStore = defineStore('game', {
     },
     async start(){
       await fetch('http://localhost:3000/start')
+      await this.connectWebSocket()
     },
     async stop(){
       await fetch('http://localhost:3000/stop')
