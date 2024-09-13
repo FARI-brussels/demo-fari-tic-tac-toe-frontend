@@ -2,7 +2,7 @@
     <div class="layout bg-color-blue">
       <FButtonIcon name="chevron-left" color="blue-light" small class="back-button" @click="$emit('exit-game')"/>
       <div class="gameboard">
-        <TicTacToeCanvas :disabled="!game.started" ref="gameBoard" />
+        <TicTacToeCanvas ref="gameBoard" />
         <div class="game-buttons">
           <FButtonIcon @click="undo" name="undo" color="red" :disabled="!game.human.active" />
           <FButtonIcon @click="endTurn" name="check" color="green" :disabled="!game.human.active" />
@@ -21,7 +21,7 @@
           />
   
       </div>
-      <GameStats v-bind="game" :loading="true" :state="canvasState"/>
+      <GameStats v-bind="{...game, state: gameboardImage }"/>
   
       <FSlideTransition :show="showError">
         <FContainer v-if="showError" class="dialog">
@@ -77,12 +77,6 @@
   const { drawGrid, resetState, playMove, updateGameBoard } = useGameStore()
   
   const gameBoard = ref()
-
-const canvasState = computed(() => {
-  const state = gameBoard.value?.state
-  console.log(state )
-  return state 
-})
 
   function setUpdateInterval(){
     setInterval(() => gameBoard.value && updateGameBoard(gameBoard.value.canvas), 100)
@@ -214,7 +208,7 @@ const canvasState = computed(() => {
     width: 100%;
   }
   
-  .dropdown-button {
+  .dropdown {
     position: absolute;
     bottom: 2rem;
     right: 2rem;

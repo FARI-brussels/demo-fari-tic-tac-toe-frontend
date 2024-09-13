@@ -5,9 +5,11 @@
       <PlayerCard v-bind="$props.human" />
       <PlayerCard v-bind="$props.robot" />
     </div>
-    <div class="robot-vision-container">
-      <!-- <canvas id="bboxCanvas"></canvas> -->
-      <CanvasClone v-bind="$props.state"/>
+    <div class="vision-wrapper bg-color-green">
+      <div class="robot-vision-container">
+      </div>
+      <CanvasClone class="canvas-clone" :state="$props.state"/>
+
     </div>
   </div>
 </template>
@@ -41,7 +43,12 @@ defineProps<GameStats>();
 
 .robot-vision-container {
   height: 20rem;
-  position: relative
+  position: absolute;
+  bottom: 20rem;
+  z-index: 2;
+}
+.canvas-clone {
+  position: absolute
 }
 
 .button-container {

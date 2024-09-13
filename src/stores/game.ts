@@ -154,20 +154,27 @@ export const useGameStore = defineStore('game', {
     },
     drawBoundingBoxes(bboxes: Array<{ x1: number; y1: number; x2: number; y2: number; class: string; confidence: number }>){
       const container = document.querySelector('.robot-vision-container');
-  
+    
       if (container) {
         container.innerHTML = '';
         
         bboxes.forEach((bbox: { x1: number; y1: number; x2: number; y2: number; class: string; confidence: number }) => {
           const { x1, y1, x2, y2, class: cls, confidence } = bbox;
     
+          // Apply the 0.52 multiplier
+          const scaledX1 = x1 * 0.52;
+          const scaledY1 = y1 * 0.52;
+          const scaledX2 = x2 * 0.52;
+          const scaledY2 = y2 * 0.52;
+    
           const box = document.createElement('div');
           box.style.position = 'absolute';
           box.style.border = '2px solid red';
-          box.style.left = `${x1}px`;
-          box.style.top = `${y1}px`;
-          box.style.width = `${x2 - x1}px`;
-          box.style.height = `${y2 - y1}px`;
+          box.style.left = `${scaledX1}px`;
+          box.style.top = `${scaledY1}px`;
+          box.style.width = `${scaledX2 - scaledX1}px`;
+
+          box.style.height = `${scaledY2 - scaledY1}px`;
           box.textContent = `${cls} (${confidence}%)`;
           box.style.color = 'white';
           box.style.fontSize = '12px';
