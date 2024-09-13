@@ -24,14 +24,19 @@ defineProps<GameStats>();
 let socket: WebSocket | null = null;
 let reconnectInterval: number | null = null;
 
+
 function connectWebSocket() {
   socket = new WebSocket('ws://0.0.0.0:8080');
 
   socket.onmessage = (event) => {
-    // Parse the received JSON data
-    console.log(event)
-    const bboxes = JSON.parse(event.data);
-    drawBoundingBoxes(bboxes);
+    try {
+      // Parse the received JSON data
+      const bboxes = JSON.parse(event.data);
+      console.log(bboxes);
+      drawBoundingBoxes(bboxes);  // Function to render the bounding boxes on the UI
+    } catch (e) {
+      console.error("Error parsing JSON data:", e);
+    }
   };
 
   socket.onclose = () => {
@@ -47,11 +52,34 @@ function connectWebSocket() {
       window.clearInterval(reconnectInterval);
       reconnectInterval = null;
     }
+
+    // Send the image every 0.1 seconds
+    setInterval(() => {
+      fetchImageAndSend();
+    }, 100);
   };
 
   socket.onerror = (error) => {
     console.error('WebSocket error:', error);
   };
+}
+
+function fetchImageAndSend() {
+  const imageUrl = 'https://media.istockphoto.com/id/1365567894/vector/hand-drawn-vector-tic-tac-toe-game-noughts-and-crosses-doodle-sketch.jpg?s=612x612&w=0&k=20&c=pSs72urXBp6V8pnXvuJIfX3krtUoFhHaX6fG2g1PxUQ=';
+
+  fetch(imageUrl)
+    .then(response => response.blob())
+    .then(blob => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Send the image as binary data (ArrayBuffer)
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(reader.result);
+        }
+      };
+      reader.readAsArrayBuffer(blob);  // Read as binary
+    })
+    .catch(error => console.error('Error fetching image:', error));
 }
 
 onMounted(() => {
@@ -66,6 +94,7 @@ onBeforeUnmount(() => {
     clearInterval(reconnectInterval);
   }
 });
+
 
 // Function to draw bounding boxes (you need to implement this)
 function drawBoundingBoxes(bboxes: Array<{ x1: number; y1: number; x2: number; y2: number; class: string; confidence: number }>) {
