@@ -53,6 +53,10 @@ export interface PlayMoveResponse {
 }
 
 export interface GameState {
+  socket: WebSocket | null
+  reconnectInterval: number | null
+  gameboardImage: string | null
+  robotVision: any,
   loading: boolean
   game: GameStats
   error: any

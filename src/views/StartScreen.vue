@@ -16,8 +16,8 @@
 
     <FSlideTransition :show="showCard">
       <FCard v-if="showCard" @close="toggleCard" @update:locale="setLocale" class="card">
-        {{ CMS.data.explanation_short[CMS.locale] }}
-        <template #footer> <div v-if="CMS.data.logo" v-html="CMS.data.logo"></div> </template>
+        {{ data.explanation_short[locale] }}
+        <template #footer> <div v-if="data.logo" v-html="data.logo"></div> </template>
       </FCard>
     </FSlideTransition>
     <div class="backdrop" :class="{ 'backdrop-active': showCard }"></div>
@@ -27,14 +27,14 @@
   
   <script setup lang="ts">
   import {  FButton, FTitle, FSubTitle, FButtonIcon, FFooter, FSlideTransition, FCard } from 'fari-component-library'
-  import { useGameStore } from '@/stores/game'
+  import { useCMS } from '@/stores/cms'
   import { storeToRefs } from 'pinia'
   import { ref, onMounted } from 'vue'
 
   defineEmits(['start-game'])
 
-  const { CMS } = storeToRefs(useGameStore())
-  const { getCMSData, setLocale } = useGameStore()
+  const { data, locale } = storeToRefs(useCMS())
+  const { getCMSData, setLocale } = useCMS()
 
   const showCard = ref(false)
 

@@ -1,5 +1,6 @@
 <template>
     <div class="layout bg-color-blue">
+      <FButtonIcon name="chevron-left" color="blue-light" small class="back-button" @click="$emit('exit-game')"/>
       <div class="gameboard">
         <TicTacToeCanvas :disabled="!game.started" ref="gameBoard" />
   
@@ -61,27 +62,35 @@
   </template>
   
   <script setup lang="ts">
-  import { TicTacToeCanvas, GameStats, AnimationContainer } from '@/components'
+  import { TonUnmounted, icTacToeCanvas, GameStats, AnimationContainer } from '@/components'
   import { storeToRefs } from 'pinia'
-  import { ref, watch } from 'vue'
+  import { ref, watch, nexTick, onMounted, onUnmounted } from 'vue'
   import { useGameStore } from '@/stores/game'
   import { FContainer, FButton, FButtonIcon, FSlideTransition, FDropdown } from 'fari-component-library'
-  import animationData from '@/assets/trophy.json'
+  import animationData from '@/assets/troimport { nextTick } from 'process'
+phy.json'
 
   const emit = defineEmits(['exit-game'])
   
   const showError = ref(false)
   const showWinner = ref(false)
   
-  const { game, error, winner, finished } = storeToRefs(useGameStore())
-  const { drawGrid, resetState, playMove } = useGameStore()
+  const { game, error, winner, finished, gameboardImage } = storeToRefs(useGameStore())
+  const { drawGrid, resetState, playMove, updateGameBoard } = useGameStore()
   
   const gameBoard = ref()
 
-  
+  function setUpdateInterval(){
+    setInterval(() => updateGameBoard(gameBoard.value.canvas), 100)
+  }
+
+  onMounted(setUpdateInterval)
+  onUnmounted(() => clearInterval(setUpdateInterval))
+
   async function endTurn() {
-    const image = gameBoard.value.canvas.toDataURL('image/png')
-    await playMove(image)
+    updateGameBoard(gameBoard.value.canvas)
+    const image = gameboardImage.value
+    if(image) await playMove(image)
   }
   
   function undo() {
@@ -114,6 +123,11 @@
     if (!val) return
     showError.value = true
   })
+
+
+  defineExpose({
+    gameBoard
+  })
   </script>
   
   <style scoped lang="scss">
@@ -123,6 +137,12 @@
     height: 100vh;
     display: flex;
     gap: 2rem;
+  }
+
+  .back-button {
+    position: absolute;
+    top: 2rem;
+    left: 4rem;
   }
   
   .backdrop {

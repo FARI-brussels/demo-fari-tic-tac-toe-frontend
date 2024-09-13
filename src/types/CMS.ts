@@ -1,6 +1,11 @@
+
 export type Locale = 'en' | 'fr-FR' | 'nl'
 
-export interface Data {
+export interface CMSState {
+  loading: boolean
+  error: any
+  locale: Locale
+  data: {
     logo?: string
     research_head: string
     research_lead: string
@@ -10,3 +15,4 @@ export interface Data {
       'fr-FR': string
     }
   }
+}
