@@ -62,13 +62,12 @@
   </template>
   
   <script setup lang="ts">
-  import { TonUnmounted, icTacToeCanvas, GameStats, AnimationContainer } from '@/components'
+  import { TicTacToeCanvas, GameStats, AnimationContainer } from '@/components'
   import { storeToRefs } from 'pinia'
-  import { ref, watch, nexTick, onMounted, onUnmounted } from 'vue'
+  import { ref, watch, onMounted, onUnmounted } from 'vue'
   import { useGameStore } from '@/stores/game'
   import { FContainer, FButton, FButtonIcon, FSlideTransition, FDropdown } from 'fari-component-library'
-  import animationData from '@/assets/troimport { nextTick } from 'process'
-phy.json'
+  import animationData from '@/assets/trophy'
 
   const emit = defineEmits(['exit-game'])
   
