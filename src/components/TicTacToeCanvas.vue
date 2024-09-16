@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, defineEmits } from 'vue'
+import { onMounted, ref, defineEmits, computed } from 'vue'
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const context = ref<CanvasRenderingContext2D | null>(null)
@@ -33,17 +33,17 @@ let isDrawing = false
 let lastX: number | null = null
 let lastY: number | null = null
 
-const canvasStates: ImageData[] = []
+const canvasStates = ref<ImageData[]>([])
 
 function saveCanvasState() {
   if (context.value && canvas.value) {
-    canvasStates.push(context.value.getImageData(0, 0, canvas.value.width, canvas.value.height))
+    canvasStates.value.push(context.value.getImageData(0, 0, canvas.value.width, canvas.value.height))
   }
 }
 
 function restoreCanvasState() {
-  if (context.value && canvasStates.length > 0) {
-    const lastState = canvasStates.pop()
+  if (context.value && canvasStates.value.length > 0) {
+    const lastState = canvasStates.value.pop()
     if (lastState) {
       context.value.putImageData(lastState, 0, 0)
     }
@@ -58,7 +58,7 @@ function clearCanvas() {
   if (context.value && canvas.value) {
     context.value.fillStyle = '#FFFFFF'
     context.value.fillRect(0, 0, canvas.value.width, canvas.value.height)
-    canvasStates.length = 0
+    canvasStates.value.length = 0
   }
 }
 
@@ -122,6 +122,7 @@ function finishDrawing() {
   lastX = null
   lastY = null
 }
+
 
 defineExpose({
   canvas,

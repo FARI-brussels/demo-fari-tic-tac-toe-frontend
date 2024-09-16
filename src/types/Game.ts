@@ -19,6 +19,7 @@ export interface GameStats {
   robot: RobotPlayer
   started: boolean
   loading: boolean
+  state: any
 }
 
 export const CANVAS_CENTER = [0.5312-0.1773, 0.2988-0.1495] as const
@@ -53,6 +54,11 @@ export interface PlayMoveResponse {
 }
 
 export interface GameState {
+  canvasState: any
+  socket: WebSocket | null
+  reconnectInterval: number | null
+  gameboardImage: string | null
+  robotVision: any,
   loading: boolean
   game: GameStats
   error: any

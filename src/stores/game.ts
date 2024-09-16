@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { CANVAS_CENTER, CANVAS_SIZE } from '../types/Game'
-import type { Locale } from '../types/Locale'
 import type {
   DrawGridRequest,
   DrawGridResponse,
@@ -16,6 +15,11 @@ import type {
 export const useGameStore = defineStore('game', {
   state: () =>
     ({
+      socket:null,
+      reconnectInterval: null,
+      gameboardImage: null,
+      robotVision: null,
+      canvasState: undefined,
       game: {
         human: {
           type: 'human',
@@ -37,19 +41,6 @@ export const useGameStore = defineStore('game', {
       winner: null,
       finished: false,
       error: null,
-      CMS: {
-        locale: 'en',
-        data: {
-          logo: '',
-          research_head: '',
-          research_lead: '',
-          explanation_short: {
-            en: '',
-            'fr-FR': '',
-            nl: ''
-          }
-        },
-      }
     }) as GameState,
   actions: {
     async drawGrid(
@@ -95,7 +86,10 @@ export const useGameStore = defineStore('game', {
         this.error = error.message
       }
     },
-    async playMove(image: PlayMoveRequest) {
+    updateGameBoard(gameBoard: HTMLCanvasElement){
+      this.gameboardImage = gameBoard.toDataURL('image/png')
+    },
+    async playMove(image: PlayMoveRequest | string) {
       this.loading = true
       this.error = null
       this.game.human.active = false
@@ -151,39 +145,94 @@ export const useGameStore = defineStore('game', {
         symbol: undefined
       }
     },
-    async getCMSData() {
-      this.loading = true
-      this.error = null
-      try {
-        const response = await fetch('http://localhost:3000/api/data')
-        const parsed = await response.json()
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        parsed.forEach((e: { [k: string]: string }) => {
-          const { research_head, research_lead, logo, locale, explanation_short } = e
-
-          if (logo) this.CMS.data.logo = logo
-          if (research_head) this.CMS.data.research_head = research_head
-          if (research_lead) this.CMS.data.research_lead = research_lead
-          if (locale) this.CMS.data.explanation_short[locale as Locale] = explanation_short
-        })
-      } catch (error) {
-        this.error = 'Error fetching data'
-      } finally {
-        this.loading = false
-      }
-    },
     async start(){
       await fetch('http://localhost:3000/start')
+      await this.connectWebSocket()
     },
     async stop(){
       await fetch('http://localhost:3000/stop')
     },
-    setLocale(locale: Locale): any {
-      this.CMS.locale = locale
+    drawBoundingBoxes(bboxes: Array<{ x1: number; y1: number; x2: number; y2: number; class: string; confidence: number }>){
+      const container = document.querySelector('.robot-vision-container');
+    
+      if (container) {
+        container.innerHTML = '';
+        
+        bboxes.forEach((bbox: { x1: number; y1: number; x2: number; y2: number; class: string; confidence: number }) => {
+          const { x1, y1, x2, y2, class: cls, confidence } = bbox;
+    
+          // Apply the 0.52 multiplier
+          const scaledX1 = x1 * 0.52;
+          const scaledY1 = y1 * 0.52;
+          const scaledX2 = x2 * 0.52;
+          const scaledY2 = y2 * 0.52;
+    
+          const box = document.createElement('div');
+          box.style.position = 'absolute';
+          box.style.border = '2px solid red';
+          box.style.left = `${scaledX1}px`;
+          box.style.top = `${scaledY1}px`;
+          box.style.width = `${scaledX2 - scaledX1}px`;
+
+          box.style.height = `${scaledY2 - scaledY1}px`;
+          box.textContent = `${cls} (${confidence}%)`;
+          box.style.color = 'white';
+          box.style.fontSize = '12px';
+          box.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    
+          container.appendChild(box);
+        });
+      }
+    },
+  async connectWebSocket() {
+      this.socket = new WebSocket('ws://0.0.0.0:8080');
+  
+      this.socket.onmessage = (event) => {
+        try {
+          const bboxes = JSON.parse(event.data);
+          console.log(bboxes);
+          this.drawBoundingBoxes(bboxes);  // Function to render the bounding boxes on the UI
+        } catch (e) {
+          console.error("Error parsing JSON data:", e);
+        }
+      };
+    
+      this.socket.onclose = () => {
+        console.log('WebSocket connection closed, attempting to reconnect...');
+
+        if (!this.reconnectInterval) 
+          this.reconnectInterval = window.setInterval(this.connectWebSocket, 5000)
+      };
+    
+      this.socket.onopen = () => {
+        console.log('WebSocket connection opened');
+        if (this.reconnectInterval) {
+          window.clearInterval(this.reconnectInterval);
+          this.reconnectInterval = null;
+        }
+    
+        setInterval(() => 
+          this.gameboardImage && this.fetchImageAndSend(this.gameboardImage),
+        100);
+      };
+    
+      this.socket.onerror = (error) => 
+        console.error('WebSocket error:', error);
+      
+    },
+    async fetchImageAndSend(url: string) {
+        fetch(url)
+        .then(response => response.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+              this.socket.send(reader.result);
+            }
+          };
+          reader.readAsArrayBuffer(blob);  // Read as binary
+        })
+        .catch(error => console.error('Error fetching image:', error));
     }
   }
 })

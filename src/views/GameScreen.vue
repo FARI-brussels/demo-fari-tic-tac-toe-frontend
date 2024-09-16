@@ -1,8 +1,8 @@
 <template>
     <div class="layout bg-color-blue">
+      <FButtonIcon name="chevron-left" color="blue-light" small class="back-button" @click="$emit('exit-game')"/>
       <div class="gameboard">
-        <TicTacToeCanvas :disabled="!game.started" ref="gameBoard" />
-  
+        <TicTacToeCanvas ref="gameBoard" />
         <div class="game-buttons">
           <FButtonIcon @click="undo" name="undo" color="red" :disabled="!game.human.active" />
           <FButtonIcon @click="endTurn" name="check" color="green" :disabled="!game.human.active" />
@@ -21,7 +21,7 @@
           />
   
       </div>
-      <GameStats v-bind="game" :loading="true"/>
+      <GameStats v-bind="{...game, state: gameboardImage }"/>
   
       <FSlideTransition :show="showError">
         <FContainer v-if="showError" class="dialog">
@@ -63,25 +63,34 @@
   <script setup lang="ts">
   import { TicTacToeCanvas, GameStats, AnimationContainer } from '@/components'
   import { storeToRefs } from 'pinia'
-  import { ref, watch } from 'vue'
+  import { ref, watch, onMounted, onUnmounted } from 'vue'
   import { useGameStore } from '@/stores/game'
   import { FContainer, FButton, FButtonIcon, FSlideTransition, FDropdown } from 'fari-component-library'
-  import animationData from '@/assets/trophy.json'
+  import animationData from '@/assets/trophy'
 
   const emit = defineEmits(['exit-game'])
   
   const showError = ref(false)
   const showWinner = ref(false)
   
-  const { game, error, winner, finished } = storeToRefs(useGameStore())
-  const { drawGrid, resetState, playMove } = useGameStore()
+  const { game, error, winner, finished, gameboardImage } = storeToRefs(useGameStore())
+  const { drawGrid, resetState, playMove, updateGameBoard } = useGameStore()
   
   const gameBoard = ref()
 
-  
+  let intervalId = undefined
+
+  function setUpdateInterval(){
+    intervalId = setInterval(() => gameBoard.value && updateGameBoard(gameBoard.value.canvas), 100)
+  }
+
+  onMounted(setUpdateInterval)
+  onUnmounted(() => clearInterval(intervalId))
+
   async function endTurn() {
-    const image = gameBoard.value.canvas.toDataURL('image/png')
-    await playMove(image)
+    updateGameBoard(gameBoard.value.canvas)
+    const image = gameboardImage.value
+    if(image) await playMove(image)
   }
   
   function undo() {
@@ -114,6 +123,11 @@
     if (!val) return
     showError.value = true
   })
+
+
+  defineExpose({
+    gameBoard
+  })
   </script>
   
   <style scoped lang="scss">
@@ -123,6 +137,12 @@
     height: 100vh;
     display: flex;
     gap: 2rem;
+  }
+
+  .back-button {
+    position: absolute;
+    top: 2rem;
+    left: 4rem;
   }
   
   .backdrop {
@@ -190,7 +210,7 @@
     width: 100%;
   }
   
-  .dropdown-button {
+  .dropdown {
     position: absolute;
     bottom: 2rem;
     right: 2rem;

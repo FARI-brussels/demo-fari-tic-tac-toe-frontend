@@ -5,16 +5,23 @@
       <PlayerCard v-bind="$props.human" />
       <PlayerCard v-bind="$props.robot" />
     </div>
-    <!-- <div class="robot-vision-container bg-color-blue-light"></div> -->
+    <div class="vision-wrapper bg-color-green">
+      <div class="robot-vision-container">
+      </div>
+      <CanvasClone class="canvas-clone" :state="$props.state"/>
+
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import PlayerCard from './PlayerCard.vue'
-import type { GameStats } from '../types/Game'
 
-defineEmits(['startGame', 'restartGame', 'exitGame'])
-defineProps<GameStats>()
+import PlayerCard from './PlayerCard.vue';
+import type { GameStats } from '../types/Game';
+import CanvasClone from './CanvasClone.vue'
+
+defineEmits(['startGame', 'restartGame', 'exitGame']);
+defineProps<GameStats>();
 
 </script>
 
@@ -36,7 +43,12 @@ defineProps<GameStats>()
 
 .robot-vision-container {
   height: 20rem;
-  border-radius: 20px;
+  position: absolute;
+  bottom: 20rem;
+  z-index: 2;
+}
+.canvas-clone {
+  position: absolute
 }
 
 .button-container {
