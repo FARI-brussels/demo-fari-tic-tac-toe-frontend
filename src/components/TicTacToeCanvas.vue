@@ -82,7 +82,7 @@ function startDrawing(event: MouseEvent | TouchEvent) {
 }
 
 function draw(event: MouseEvent | TouchEvent) {
-  // if (!isDrawing || !context.value || lastX === null || lastY === null) return
+  if (!isDrawing || !context.value || lastX === null || lastY === null) return
   event.preventDefault()
   const { x, y } = getCoordinates(event)
   context.value.strokeStyle = '#2E4FBF'
@@ -123,13 +123,11 @@ function finishDrawing() {
   lastY = null
 }
 
-const state = computed(()=>  canvasStates.value[0])
 
 defineExpose({
   canvas,
   undo,
   clearCanvas,
-  state
 })
 </script>
 

@@ -63,7 +63,7 @@
   <script setup lang="ts">
   import { TicTacToeCanvas, GameStats, AnimationContainer } from '@/components'
   import { storeToRefs } from 'pinia'
-  import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+  import { ref, watch, onMounted, onUnmounted } from 'vue'
   import { useGameStore } from '@/stores/game'
   import { FContainer, FButton, FButtonIcon, FSlideTransition, FDropdown } from 'fari-component-library'
   import animationData from '@/assets/trophy'
@@ -78,12 +78,14 @@
   
   const gameBoard = ref()
 
+  let intervalId = undefined
+
   function setUpdateInterval(){
-    setInterval(() => gameBoard.value && updateGameBoard(gameBoard.value.canvas), 100)
+    intervalId = setInterval(() => gameBoard.value && updateGameBoard(gameBoard.value.canvas), 100)
   }
 
   onMounted(setUpdateInterval)
-  //onUnmounted(() => clearInterval(setUpdateInterval))
+  onUnmounted(() => clearInterval(intervalId))
 
   async function endTurn() {
     updateGameBoard(gameBoard.value.canvas)
