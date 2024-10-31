@@ -8,8 +8,8 @@ import lottie from 'lottie-web'
 
 const props = defineProps<{
   animationData: Object
-  loop?: boolean,
-  delay?: number,
+  loop?: boolean
+  delay?: number
 }>()
 
 const lottieContainer = ref<HTMLElement | null>(null)
@@ -25,7 +25,7 @@ function init({ container, animationData }: { container: HTMLElement; animationD
 }
 
 onMounted(() => {
-  const delay = props.delay ?? 200;
+  const delay = props.delay ?? 200
 
   if (lottieContainer.value && props.animationData) {
     setTimeout(() => {
@@ -44,4 +44,3 @@ onMounted(() => {
   height: 247px;
 }
 </style>
-

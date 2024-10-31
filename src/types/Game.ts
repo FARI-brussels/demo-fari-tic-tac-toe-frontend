@@ -22,10 +22,8 @@ export interface GameStats {
   state: any
 }
 
-export const CANVAS_CENTER = [0.5312-0.1773, 0.2988-0.1495] as const
+export const CANVAS_CENTER = [0.5312 - 0.1773, 0.2988 - 0.1495] as const
 export const CANVAS_SIZE = [0.12, 0.12] as const
-// export const CANVAS_CENTER = [ 540, 414 ] as const;
-// export const CANVAS_SIZE = [0.1] as const
 
 type GridItem = 'X' | 'O' | ' '
 
@@ -58,7 +56,7 @@ export interface GameState {
   socket: WebSocket | null
   reconnectInterval: number | null
   gameboardImage: string | null
-  robotVision: any,
+  robotVision: any
   loading: boolean
   game: GameStats
   error: any

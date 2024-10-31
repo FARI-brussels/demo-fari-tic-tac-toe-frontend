@@ -37,7 +37,9 @@ const canvasStates = ref<ImageData[]>([])
 
 function saveCanvasState() {
   if (context.value && canvas.value) {
-    canvasStates.value.push(context.value.getImageData(0, 0, canvas.value.width, canvas.value.height))
+    canvasStates.value.push(
+      context.value.getImageData(0, 0, canvas.value.width, canvas.value.height)
+    )
   }
 }
 
@@ -123,11 +125,10 @@ function finishDrawing() {
   lastY = null
 }
 
-
 defineExpose({
   canvas,
   undo,
-  clearCanvas,
+  clearCanvas
 })
 </script>
 
