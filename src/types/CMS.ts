@@ -1,4 +1,3 @@
-
 export type Locale = 'en' | 'fr-FR' | 'nl'
 
 export interface CMSState {
@@ -9,10 +8,14 @@ export interface CMSState {
     logo?: string
     research_head: string
     research_lead: string
-    explanation_short: {
-      en: string
-      nl: string
-      'fr-FR': string
+    title: {
+      [locale in Locale]: string
+    }
+    topic: {
+      [locale in Locale]: string
+    }
+    description: {
+      [locale in Locale]: string
     }
   }
 }

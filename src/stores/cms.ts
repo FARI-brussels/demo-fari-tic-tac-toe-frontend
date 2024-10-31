@@ -1,51 +1,35 @@
 import { defineStore } from 'pinia'
 import type { CMSState, Locale } from '@/types/CMS'
+import { fetchDirectus } from 'fari-directus-parser'
+import { ref } from 'vue'
 
-export const useCMS = defineStore('cms', {
-  state: () =>
-    ({
-      loading: false,
-      error: null,
-        locale: 'en',
-        data: {
-          logo: '',
-          research_head: '',
-          research_lead: '',
-          explanation_short: {
-            en: '',
-            'fr-FR': '',
-            nl: ''
-          }
-        },
-    }) as CMSState,
-  actions: {
-    async getCMSData() {
-      this.loading = true
-      this.error = null
-      try {
-        const response = await fetch('http://localhost:3000/api/data')
-        const parsed = await response.json()
+export const useCMS = defineStore('cms', () => {
+  const loading = ref(false)
+  const error = ref<unknown | null>(null)
+  const data = ref<CMSState>({} as CMSState)
+  const locale = ref<Locale>('en')
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
+  async function getCMSData() {
+    try {
+      loading.value = true
+      const ticTacToeInfo = await fetchDirectus({ slug: 'tic-tac-toe' })
+      data.value = ticTacToeInfo
+    } catch (err) {
+      if (err) error.value = err
+      console.error(error.value)
+    } finally {
+      loading.value = false
+    }
+  }
 
-        parsed.forEach((e: { [k: string]: string }) => {
-          const { research_head, research_lead, logo, locale, explanation_short } = e
+  const setLocale = (newLocale: Locale) => (locale.value = newLocale)
 
-          if (logo) this.data.logo = logo
-          if (research_head) this.data.research_head = research_head
-          if (research_lead) this.data.research_lead = research_lead
-          if (locale) this.data.explanation_short[locale as Locale] = explanation_short
-        })
-      } catch (error) {
-        this.error = 'Error fetching data'
-      } finally {
-        this.loading = false
-      }
-    },
-    setLocale(locale: Locale): any {
-      this.locale = locale
-    },
+  return {
+    loading,
+    error,
+    data,
+    locale,
+    getCMSData,
+    setLocale
   }
 })

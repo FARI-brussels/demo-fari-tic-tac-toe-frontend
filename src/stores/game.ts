@@ -11,11 +11,10 @@ import type {
   RobotPlayer
 } from '../types/Game'
 
-
 export const useGameStore = defineStore('game', {
   state: () =>
     ({
-      socket:null,
+      socket: null,
       reconnectInterval: null,
       gameboardImage: null,
       robotVision: null,
@@ -33,14 +32,13 @@ export const useGameStore = defineStore('game', {
           points: 0,
           active: false
         } as RobotPlayer,
-        started: false,
-
+        started: false
       },
       loading: false,
       gridMessage: null,
       winner: null,
       finished: false,
-      error: null,
+      error: null
     }) as GameState,
   actions: {
     async drawGrid(
@@ -70,7 +68,6 @@ export const useGameStore = defineStore('game', {
 
         this.gridMessage = data.message
 
-
         this.game.human.active = true
         this.game.robot.active = false
       } catch (error: any) {
@@ -86,7 +83,7 @@ export const useGameStore = defineStore('game', {
         this.error = error.message
       }
     },
-    updateGameBoard(gameBoard: HTMLCanvasElement){
+    updateGameBoard(gameBoard: HTMLCanvasElement) {
       this.gameboardImage = gameBoard.toDataURL('image/png')
     },
     async playMove(image: PlayMoveRequest | string) {
@@ -94,7 +91,7 @@ export const useGameStore = defineStore('game', {
       this.error = null
       this.game.human.active = false
       this.game.robot.active = true
-  
+
       try {
         const response = await fetch('http://localhost:3000/play', {
           method: 'POST',
@@ -104,11 +101,10 @@ export const useGameStore = defineStore('game', {
           body: JSON.stringify({ image })
         })
 
-        if (!response.ok) 
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
         this.game.human.points++
-        
+
         const data: PlayMoveResponse = await response.json()
 
         this.gridState = data.grid_state
@@ -119,7 +115,6 @@ export const useGameStore = defineStore('game', {
         this.game.human.active = true
         this.game.robot.active = false
         this.loading = false
-
       } catch (error: any) {
         console.error('Error:', error)
         this.error = error.message
@@ -145,94 +140,108 @@ export const useGameStore = defineStore('game', {
         symbol: undefined
       }
     },
-    async start(){
+    async start() {
       await fetch('http://localhost:3000/start')
       await this.connectWebSocket()
     },
-    async stop(){
+    async stop() {
       await fetch('http://localhost:3000/stop')
     },
-    drawBoundingBoxes(bboxes: Array<{ x1: number; y1: number; x2: number; y2: number; class: string; confidence: number }>){
-      const container = document.querySelector('.robot-vision-container');
-    
-      if (container) {
-        container.innerHTML = '';
-        
-        bboxes.forEach((bbox: { x1: number; y1: number; x2: number; y2: number; class: string; confidence: number }) => {
-          const { x1, y1, x2, y2, class: cls, confidence } = bbox;
-    
-          // Apply the 0.52 multiplier
-          const scaledX1 = x1 * 0.52;
-          const scaledY1 = y1 * 0.52;
-          const scaledX2 = x2 * 0.52;
-          const scaledY2 = y2 * 0.52;
-    
-          const box = document.createElement('div');
-          box.style.position = 'absolute';
-          box.style.border = '2px solid red';
-          box.style.left = `${scaledX1}px`;
-          box.style.top = `${scaledY1}px`;
-          box.style.width = `${scaledX2 - scaledX1}px`;
+    drawBoundingBoxes(
+      bboxes: Array<{
+        x1: number
+        y1: number
+        x2: number
+        y2: number
+        class: string
+        confidence: number
+      }>
+    ) {
+      const container = document.querySelector('.robot-vision-container')
 
-          box.style.height = `${scaledY2 - scaledY1}px`;
-          box.textContent = `${cls} (${confidence}%)`;
-          box.style.color = 'white';
-          box.style.fontSize = '12px';
-          box.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    
-          container.appendChild(box);
-        });
+      if (container) {
+        container.innerHTML = ''
+
+        bboxes.forEach(
+          (bbox: {
+            x1: number
+            y1: number
+            x2: number
+            y2: number
+            class: string
+            confidence: number
+          }) => {
+            const { x1, y1, x2, y2, class: cls, confidence } = bbox
+
+            // Apply the 0.52 multiplier
+            const scaledX1 = x1 * 0.52
+            const scaledY1 = y1 * 0.52
+            const scaledX2 = x2 * 0.52
+            const scaledY2 = y2 * 0.52
+
+            const box = document.createElement('div')
+            box.style.position = 'absolute'
+            box.style.border = '2px solid red'
+            box.style.left = `${scaledX1}px`
+            box.style.top = `${scaledY1}px`
+            box.style.width = `${scaledX2 - scaledX1}px`
+
+            box.style.height = `${scaledY2 - scaledY1}px`
+            box.textContent = `${cls} (${confidence}%)`
+            box.style.color = 'white'
+            box.style.fontSize = '12px'
+            box.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
+
+            container.appendChild(box)
+          }
+        )
       }
     },
-  async connectWebSocket() {
-      this.socket = new WebSocket('ws://0.0.0.0:8080');
-  
+    async connectWebSocket() {
+      this.socket = new WebSocket('ws://0.0.0.0:8080')
+
       this.socket.onmessage = (event) => {
         try {
-          const bboxes = JSON.parse(event.data);
-          console.log(bboxes);
-          this.drawBoundingBoxes(bboxes);  // Function to render the bounding boxes on the UI
+          const bboxes = JSON.parse(event.data)
+          console.log(bboxes)
+          this.drawBoundingBoxes(bboxes) // Function to render the bounding boxes on the UI
         } catch (e) {
-          console.error("Error parsing JSON data:", e);
+          console.error('Error parsing JSON data:', e)
         }
-      };
-    
-      this.socket.onclose = () => {
-        console.log('WebSocket connection closed, attempting to reconnect...');
+      }
 
-        if (!this.reconnectInterval) 
+      this.socket.onclose = () => {
+        console.log('WebSocket connection closed, attempting to reconnect...')
+
+        if (!this.reconnectInterval)
           this.reconnectInterval = window.setInterval(this.connectWebSocket, 5000)
-      };
-    
+      }
+
       this.socket.onopen = () => {
-        console.log('WebSocket connection opened');
+        console.log('WebSocket connection opened')
         if (this.reconnectInterval) {
-          window.clearInterval(this.reconnectInterval);
-          this.reconnectInterval = null;
+          window.clearInterval(this.reconnectInterval)
+          this.reconnectInterval = null
         }
-    
-        setInterval(() => 
-          this.gameboardImage && this.fetchImageAndSend(this.gameboardImage),
-        100);
-      };
-    
-      this.socket.onerror = (error) => 
-        console.error('WebSocket error:', error);
-      
+
+        setInterval(() => this.gameboardImage && this.fetchImageAndSend(this.gameboardImage), 100)
+      }
+
+      this.socket.onerror = (error) => console.error('WebSocket error:', error)
     },
     async fetchImageAndSend(url: string) {
-        fetch(url)
-        .then(response => response.blob())
-        .then(blob => {
-          const reader = new FileReader();
+      fetch(url)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const reader = new FileReader()
           reader.onloadend = () => {
             if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-              this.socket.send(reader.result);
+              this.socket.send(reader.result)
             }
-          };
-          reader.readAsArrayBuffer(blob);  // Read as binary
+          }
+          reader.readAsArrayBuffer(blob) // Read as binary
         })
-        .catch(error => console.error('Error fetching image:', error));
+        .catch((error) => console.error('Error fetching image:', error))
     }
   }
 })

@@ -1,13 +1,11 @@
 <template>
   <div class="img-container">
-    <img class="img rounded-s" :src="props.state" >
+    <img class="img rounded-s" :src="props.state" />
   </div>
 </template>
 
 <script setup lang="ts">
 const props = defineProps<{ state: ImageData }>()
-
-
 </script>
 
 <style scoped lang="scss">
@@ -22,6 +20,4 @@ const props = defineProps<{ state: ImageData }>()
     height: 435px;
   }
 }
-
-
 </style>
