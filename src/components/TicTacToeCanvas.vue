@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, defineEmits, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const context = ref<CanvasRenderingContext2D | null>(null)
