@@ -14,6 +14,7 @@ export const useCMS = defineStore('cms', () => {
       loading.value = true
       const ticTacToeInfo = await fetchDirectus({ slug: 'tic-tac-toe' })
       data.value = ticTacToeInfo
+      
     } catch (err) {
       if (err) error.value = err
       console.error(error.value)

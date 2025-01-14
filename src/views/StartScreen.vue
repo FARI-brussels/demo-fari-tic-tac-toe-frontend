@@ -22,7 +22,24 @@
     <FSlideTransition :show="showCard">
       <FCard v-if="showCard" @close="toggleCard" @update:locale="setLocale" class="card">
         {{ data.description[locale] }}
-        <template #footer> <div v-if="data.logo" v-html="data.logo"></div> </template>
+
+           <div class="researchers-container">
+          <span class="researchers">
+            research head: <span class="research-head color-black"> {{ data.research_head }} </span>
+          </span>
+          <span class="researchers">
+            research lead: <span class="research-lead color-black"> {{ data.research_lead }} </span>
+          </span>
+          <div class="flex">
+            <img v-for="sdg in data.sdg_images" :key="sdg" :src="sdg" class="sdg mr-md mt-sm" />
+          </div>
+        </div>
+
+        <template #footer>
+          <div v-if="data?.logos">
+            <img v-for="logo in data.logos" :src="logo" :key="logo" class="card-logo" />
+          </div>
+        </template>
       </FCard>
     </FSlideTransition>
     <div class="backdrop" :class="{ 'backdrop-active': showCard }"></div>
@@ -125,5 +142,20 @@ const toggleCard = () => (showCard.value = !showCard.value)
     backdrop-filter: blur(2px);
     transition: all 300ms;
   }
+}
+
+.researchers-container {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-logo {
+  height: 3.5rem;
+  margin-right: 2rem;
+}
+.sdg {
+  height: 3.5rem;
+  width: 3.5rem;
 }
 </style>
