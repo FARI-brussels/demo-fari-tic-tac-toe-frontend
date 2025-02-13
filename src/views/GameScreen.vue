@@ -8,6 +8,7 @@
       @click="$emit('exit-game')"
     />
     <div class="gameboard">
+      <FButton v-if="!game.started" @click="startGame" label="Start Game" type="primary" class="start-button"/>
       <TicTacToeCanvas ref="gameBoard" />
       <div class="game-buttons">
         <FButtonIcon @click="undo" name="undo" color="red" :disabled="!game.human.active" />
@@ -15,12 +16,13 @@
       </div>
 
       <FDropdown
+        v-if="game.started"
         @select="handleSelect"
         name="menu"
         color="blue"
         location="top-left"
         :items="[
-          { label: game.started ? 'Restart' : 'Start Game', value: 'start' },
+          { label: 'Restart', value: 'start' },
           { label: 'Exit Game', value: 'exit' }
         ]"
         class="dropdown-button"
@@ -114,7 +116,6 @@ async function startGame() {
 }
 
 async function handleSelect(value: string | number) {
-  if (value === 'start') startGame()
   if (value === 'restart') startGame()
   if (value === 'exit') {
     resetState()
@@ -144,6 +145,12 @@ defineExpose({
   height: 100vh;
   display: flex;
   gap: 2rem;
+}
+
+.start-button {
+  position: absolute;
+  top: 45%;
+  left: 42%;
 }
 
 .back-button {
