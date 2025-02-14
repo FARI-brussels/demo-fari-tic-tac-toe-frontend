@@ -105,7 +105,7 @@ export const useGameStore = defineStore('game', {
 
         this.game.human.points++
 
-        const data: PlayMoveResponse = await response.json()
+        const data: PlayMoveResponse = await response.json() as PlayMoveResponse
 
         this.gridState = data.grid_state
         this.move = data.move

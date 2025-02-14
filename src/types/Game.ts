@@ -1,4 +1,5 @@
-import type { Locale, Data } from './Locale'
+import type { CMSState } from './CMS'
+import { WebSocket } from 'ws'
 export interface Player {
   symbol: 'X' | 'O' | undefined
   points: number
@@ -65,8 +66,5 @@ export interface GameState {
   finished: boolean
   gridState: string[][] | null
   move: string | null
-  CMS: {
-    locale: Locale
-    data: Data
-  }
+  CMS: CMSState
 }
