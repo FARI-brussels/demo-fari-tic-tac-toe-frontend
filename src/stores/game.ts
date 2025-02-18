@@ -41,6 +41,8 @@ export const useGameStore = defineStore('game', {
       error: null
     }) as GameState,
   actions: {
+
+    setLoading(loading: boolean){ this.loading = loading },
     async drawGrid(
       { center = CANVAS_CENTER, size = CANVAS_SIZE }: DrawGridRequest = {
         center: CANVAS_CENTER,
@@ -145,6 +147,7 @@ export const useGameStore = defineStore('game', {
       await this.connectWebSocket()
     },
     async stop() {
+      this.resetState()
       await fetch('http://localhost:3000/stop')
     },
     drawBoundingBoxes(

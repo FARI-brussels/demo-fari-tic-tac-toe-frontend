@@ -8,7 +8,19 @@
       @click="$emit('exit-game')"
     />
     <div class="gameboard">
-      <FButton v-if="!game.started" @click="startGame" label="Start Game" type="primary" class="start-button"/>
+      <FButton 
+        v-if="!game.started" 
+        @click="startGame" 
+        label="Start Game" 
+        type="primary" 
+        class="start-button"
+        :disabled="loading"
+      >
+      <template  #append-icon >
+        <div v-if="loading" class="lds-dual-ring"></div>
+        <FIcon v-else name="chevron-right" color="white" />     
+      </template>
+    </FButton>
       <TicTacToeCanvas ref="gameBoard" />
       <div class="game-buttons">
         <FButtonIcon @click="undo" name="undo" color="red" :disabled="!game.human.active" />
@@ -74,7 +86,8 @@ import {
   FButton,
   FButtonIcon,
   FSlideTransition,
-  FDropdown
+  FDropdown,
+  FIcon
 } from 'fari-component-library'
 import animationData from '@/assets/trophy'
 
@@ -83,8 +96,8 @@ const emit = defineEmits(['exit-game'])
 const showError = ref(false)
 const showWinner = ref(false)
 
-const { game, error, winner, finished, gameboardImage } = storeToRefs(useGameStore())
-const { drawGrid, resetState, playMove, updateGameBoard } = useGameStore()
+const { game, error, winner, finished, gameboardImage, loading } = storeToRefs(useGameStore())
+const { drawGrid, resetState, playMove, updateGameBoard, setLoading } = useGameStore()
 
 const gameBoard = ref()
 
@@ -109,10 +122,15 @@ function undo() {
 }
 
 async function startGame() {
-  showError.value = false
-  showWinner.value = false
-  gameBoard.value.clearCanvas()
-  await drawGrid()
+  setLoading(true)
+  console.log('hej')
+  setTimeout(async () => {
+    showError.value = false
+    showWinner.value = false
+    gameBoard.value.clearCanvas()
+    await drawGrid()
+    setLoading(false)
+  }, 5000)
 }
 
 async function handleSelect(value: string | number) {
@@ -245,4 +263,37 @@ p {
   font-size: 20px;
   margin-top: 1rem;
 }
+
+
+
+.lds-dual-ring,
+.lds-dual-ring:after {
+  box-sizing: border-box;
+}
+.lds-dual-ring {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 4px solid currentColor;
+  border-color: currentColor transparent currentColor transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
 </style>
