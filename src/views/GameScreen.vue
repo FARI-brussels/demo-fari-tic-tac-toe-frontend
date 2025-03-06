@@ -11,7 +11,7 @@
       <FButton 
         v-if="!game.started" 
         @click="startGame" 
-        label="Start Game" 
+        :label="loading ? 'Initializing...' : 'Start Game'" 
         type="primary" 
         class="start-button"
         :disabled="loading"
@@ -34,7 +34,7 @@
         color="blue"
         location="top-left"
         :items="[
-          { label: 'Restart', value: 'start' },
+          { label: 'Restart', value: 'restart' },
           { label: 'Exit Game', value: 'exit' }
         ]"
         class="dropdown-button"
@@ -107,7 +107,17 @@ function setUpdateInterval() {
   intervalId = setInterval(() => gameBoard.value && updateGameBoard(gameBoard.value.canvas), 100)
 }
 
-onMounted(setUpdateInterval)
+onMounted(() => { 
+  setUpdateInterval
+  setLoading(true)
+
+  setTimeout(async () => {
+    showError.value = false
+    showWinner.value = false
+    gameBoard.value.clearCanvas()
+    setLoading(false)
+  }, 5000)
+})
 onUnmounted(() => clearInterval(intervalId))
 
 async function endTurn() {
@@ -123,14 +133,10 @@ function undo() {
 
 async function startGame() {
   setLoading(true)
-  console.log('hej')
-  setTimeout(async () => {
-    showError.value = false
-    showWinner.value = false
-    gameBoard.value.clearCanvas()
-    await drawGrid()
-    setLoading(false)
-  }, 5000)
+  showError.value = false
+  showWinner.value = false
+  gameBoard.value.clearCanvas()
+  await drawGrid()
 }
 
 async function handleSelect(value: string | number) {
