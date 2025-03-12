@@ -108,7 +108,7 @@ function setUpdateInterval() {
 }
 
 onMounted(() => { 
-  setUpdateInterval
+  setUpdateInterval()
   setLoading(true)
 
   setTimeout(async () => {
